@@ -1,0 +1,86 @@
+
+
+
+
+
+
+ {
+  width: 200px;
+  border-radius: 30px;
+}
+
+body {
+  background: #01060c;
+  color: white;
+  font-family: Arial;
+}
+
+
+
+
+.logo {
+  width: 200px;
+  border-radius: 30px;
+}
+
+
+.logo {
+  width: 200px;
+  border-radius: 30px;
+}
+
+.container {
+  display: flex;
+  gap: 20px;
+}
+
+.form {
+  width: 300px;
+  background: #060561;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+input {
+  width: 90%;
+  padding: 10px;
+  margin: 5px 0;
+  background: #020617;
+  border: 1px solid #1e293b;
+  color: red;
+  border-radius: 20px;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.salvar {
+  background: #22c55e;
+}
+.editar {
+  background: orange;
+}
+.excluir {
+  background: red;
+}
+
+.card {
+  background: #018d01;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-left: 5px solid #22c55e;
+  width: 300px;
+  border-radius: 15px;
+}
+
+.alerta {
+  border-left: 5px solid red;
+}
+
+body {
+  background: red;
+}

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cetech Sistemas</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+
+  <body>
+    <div><img src="./img/LOGO FINALIZADA OK.jpg " class="logo" alt="" /></div>
+
+    <h2 class="inicial">Cetech Sistemas</h2>
+
+    <div class="container">
+      <div class="form">
+        <input id="nome" placeholder="Cliente" />
+        <input id="sistema" placeholder="Sistema" />
+        <input id="custo" placeholder="Custo" />
+        <input id="venda" placeholder="Venda" />
+
+        <input id="gdoor" placeholder="Vencimento Gdoor (dia)" />
+        <input id="cetech" placeholder="Vencimento Cetech (dia)" />
+
+        <button class="salvar" onclick="salvar()">Salvar</button>
+      </div>
+
+      <div id="lista"></div>
+    </div>
+
+    <script>
+      let editandoId = null;
+
+      function calcularDias(dia) {
+        if (!dia) return 0;
+
+        const hoje = new Date().getDate();
+        let diff = dia - hoje;
+
+        if (diff < 0) diff += 30;
+
+        return diff;
+      }
+
+      function salvar() {
+        const dados = {
+          nome: document.getElementById("nome").value,
+          sistema: document.getElementById("sistema").value,
+          custo: parseFloat(document.getElementById("custo").value),
+          venda: parseFloat(document.getElementById("venda").value),
+          dia_gdoor: parseInt(document.getElementById("gdoor").value),
+          dia_cetech: parseInt(document.getElementById("cetech").value),
+        };
+
+        const url = editandoId
+          ? `http://localhost:3000/clientes/${editandoId}`
+          : `http://localhost:3000/clientes`;
+
+        const metodo = editandoId ? "PUT" : "POST";
+
+        fetch(url, {
+          method: metodo,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dados),
+        }).then(() => {
+          limpar();
+          editandoId = null;
+          carregar();
+        });
+      }
+
+      function excluir(id) {
+        fetch(`http://localhost:3000/clientes/${id}`, {
+          method: "DELETE",
+        }).then(() => carregar());
+      }
+
+      function editar(c) {
+        document.getElementById("nome").value = c.nome;
+        document.getElementById("sistema").value = c.sistema;
+        document.getElementById("custo").value = c.custo;
+        document.getElementById("venda").value = c.venda;
+        document.getElementById("gdoor").value = c.dia_vencimento_gdoor;
+        document.getElementById("cetech").value = c.dia_vencimento_cetech;
+
+        editandoId = c.id;
+      }
+
+      function limpar() {
+        document.getElementById("nome").value = "";
+      }
+
+      function carregar() {
+        fetch("http://localhost:3000/clientes")
+          .then((res) => res.json())
+          .then((clientes) => {
+            lista.innerHTML = "";
+
+            clientes.forEach((c) => {
+              const diasG = calcularDias(c.dia_vencimento_gdoor);
+              const diasC = calcularDias(c.dia_vencimento_cetech);
+
+              lista.innerHTML += `
+        <div class="card">
+          <h3>${c.nome}</h3>
+          <p>${c.sistema}</p>
+          <p>💰 Lucro: R$ ${(c.venda - c.custo).toFixed(2)}</p>
+
+          <p>📅 Gdoor: ${c.dia_vencimento_gdoor || "Não definido"} (${diasG} dias)</p>
+          <p>📅 Cetech: ${c.dia_vencimento_cetech || "Não definido"} (${diasC} dias)</p>
+
+          <button class="editar" onclick='editar(${JSON.stringify(c)})'>Editar</button>
+          <button class="excluir" onclick="excluir(${c.id})">Excluir</button>
+        </div>
+      `;
+            });
+          });
+      }
+
+      carregar();
+    </script>
+  </body>
+</html>
