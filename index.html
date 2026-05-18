@@ -7,28 +7,49 @@
   </head>
 
   <body>
-    <div><img src="./img/LOGO FINALIZADA OK.jpg " class="logo" alt="" /></div>
+    <img src="./img/LOGO FINALIZADA OK.jpg" class="logo" />
 
     <h2 class="inicial">Cetech Sistemas</h2>
+
+    <div class="resumo">
+      <h3 id="totalVenda">💰 Total vendido: R$ 0.00</h3>
+      <h3 id="totalCusto">💸 Total custo: R$ 0.00</h3>
+      <h3 id="lucroTotal">🟢 Lucro líquido: R$ 0.00</h3>
+    </div>
 
     <div class="container">
       <div class="form">
         <input id="nome" placeholder="Cliente" />
         <input id="sistema" placeholder="Sistema" />
-        <input id="custo" placeholder="Custo" />
-        <input id="venda" placeholder="Venda" />
-
-        <input id="gdoor" placeholder="Vencimento Gdoor (dia)" />
-        <input id="cetech" placeholder="Vencimento Cetech (dia)" />
+        <input id="custo" placeholder="Custo" type="number" />
+        <input id="venda" placeholder="Venda" type="number" />
+        <input id="gdoor" placeholder="Venc. Gdoor" type="number" />
+        <input id="cetech" placeholder="Venc. Cetech" type="number" />
 
         <button class="salvar" onclick="salvar()">Salvar</button>
       </div>
+
+      <input
+        id="busca"
+        placeholder="🔎 Buscar cliente..."
+        oninput="filtrar()"
+      />
 
       <div id="lista"></div>
     </div>
 
     <script>
       let editandoId = null;
+
+      function filtrar() {
+        const termo = document.getElementById("busca").value.toLowerCase();
+        const cards = document.querySelectorAll(".card");
+
+        cards.forEach((card) => {
+          const nome = card.querySelector("h3").innerText.toLowerCase();
+          card.style.display = nome.includes(termo) ? "block" : "none";
+        });
+      }
 
       function calcularDias(dia) {
         if (!dia) return 0;
@@ -45,10 +66,12 @@
         const dados = {
           nome: document.getElementById("nome").value,
           sistema: document.getElementById("sistema").value,
-          custo: parseFloat(document.getElementById("custo").value),
-          venda: parseFloat(document.getElementById("venda").value),
-          dia_gdoor: parseInt(document.getElementById("gdoor").value),
-          dia_cetech: parseInt(document.getElementById("cetech").value),
+          custo: parseFloat(document.getElementById("custo").value) || 0,
+          venda: parseFloat(document.getElementById("venda").value) || 0,
+          dia_vencimento_gdoor:
+            parseInt(document.getElementById("gdoor").value) || null,
+          dia_vencimento_cetech:
+            parseInt(document.getElementById("cetech").value) || null,
         };
 
         const url = editandoId
@@ -79,40 +102,80 @@
         document.getElementById("sistema").value = c.sistema;
         document.getElementById("custo").value = c.custo;
         document.getElementById("venda").value = c.venda;
-        document.getElementById("gdoor").value = c.dia_vencimento_gdoor;
-        document.getElementById("cetech").value = c.dia_vencimento_cetech;
+        document.getElementById("gdoor").value = c.dia_vencimento_gdoor || "";
+        document.getElementById("cetech").value = c.dia_vencimento_cetech || "";
 
         editandoId = c.id;
       }
 
       function limpar() {
         document.getElementById("nome").value = "";
+        document.getElementById("sistema").value = "";
+        document.getElementById("custo").value = "";
+        document.getElementById("venda").value = "";
+        document.getElementById("gdoor").value = "";
+        document.getElementById("cetech").value = "";
       }
 
       function carregar() {
         fetch("http://localhost:3000/clientes")
           .then((res) => res.json())
           .then((clientes) => {
+            const lista = document.getElementById("lista");
+
+            const totalVendaEl = document.getElementById("totalVenda");
+            const totalCustoEl = document.getElementById("totalCusto");
+            const lucroTotalEl = document.getElementById("lucroTotal");
+
             lista.innerHTML = "";
+
+            let totalVenda = 0;
+            let totalCusto = 0;
 
             clientes.forEach((c) => {
               const diasG = calcularDias(c.dia_vencimento_gdoor);
               const diasC = calcularDias(c.dia_vencimento_cetech);
 
-              lista.innerHTML += `
-        <div class="card">
-          <h3>${c.nome}</h3>
-          <p>${c.sistema}</p>
-          <p>💰 Lucro: R$ ${(c.venda - c.custo).toFixed(2)}</p>
+              const venda = parseFloat(c.venda) || 0;
+              const custo = parseFloat(c.custo) || 0;
+              const lucro = venda - custo;
 
-          <p>📅 Gdoor: ${c.dia_vencimento_gdoor || "Não definido"} (${diasG} dias)</p>
-          <p>📅 Cetech: ${c.dia_vencimento_cetech || "Não definido"} (${diasC} dias)</p>
+              totalVenda += venda;
+              totalCusto += custo;
 
-          <button class="editar" onclick='editar(${JSON.stringify(c)})'>Editar</button>
-          <button class="excluir" onclick="excluir(${c.id})">Excluir</button>
-        </div>
-      `;
+              const card = document.createElement("div");
+              card.className = "card";
+
+              card.innerHTML = `
+    <h3>${c.nome}</h3>
+    <p>${c.sistema}</p>
+    <p>💰 Venda: R$ ${venda.toFixed(2)}</p>
+    <p>💸 Custo: R$ ${custo.toFixed(2)}</p>
+    <p>🟢 Lucro: R$ ${lucro.toFixed(2)}</p>
+
+    <p>
+      📅 Gdoor: ${c.dia_vencimento_gdoor || "Não definido"} (${diasG} dias)
+    </p>
+
+    <p>
+      📅 Cetech: ${c.dia_vencimento_cetech || "Não definido"} (${diasC} dias)
+    </p>
+
+    <button class="editar">Editar</button>
+    <button class="excluir">Excluir</button>
+  `;
+
+              card.querySelector(".editar").onclick = () => editar(c);
+              card.querySelector(".excluir").onclick = () => excluir(c.id);
+
+              lista.appendChild(card);
             });
+
+            const lucroTotal = totalVenda - totalCusto;
+
+            totalVendaEl.innerText = `💰 Total vendido: R$ ${totalVenda.toFixed(2)}`;
+            totalCustoEl.innerText = `💸 Total custo: R$ ${totalCusto.toFixed(2)}`;
+            lucroTotalEl.innerText = `🟢 Lucro líquido: R$ ${lucroTotal.toFixed(2)}`;
           });
       }
 

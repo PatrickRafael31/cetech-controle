@@ -1,86 +1,131 @@
-
-
-
-
-
-
- {
-  width: 200px;
-  border-radius: 30px;
-}
-
 body {
-  background: #01060c;
-  color: white;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
-
-
-
 .logo {
-  width: 200px;
-  border-radius: 30px;
+  width: 120px;
+  margin-top: 20px;
 }
 
-
-.logo {
-  width: 200px;
-  border-radius: 30px;
+.inicial {
+  margin: 10px 0 20px;
+  color: #22c55e;
 }
 
 .container {
-  display: flex;
-  gap: 20px;
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
 }
 
 .form {
-  width: 300px;
-  background: #060561;
-  padding: 20px;
-  border-radius: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 input {
-  width: 90%;
   padding: 10px;
-  margin: 5px 0;
-  background: #020617;
-  border: 1px solid #1e293b;
-  color: red;
-  border-radius: 20px;
-}
-
-button {
-  padding: 10px;
+  border-radius: 8px;
   border: none;
-  cursor: pointer;
-  margin-top: 5px;
+  outline: none;
 }
 
 .salvar {
   background: #22c55e;
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
 }
-.editar {
-  background: orange;
+
+.salvar:hover {
+  background: #16a34a;
 }
-.excluir {
-  background: red;
+
+#lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
 }
 
 .card {
-  background: #018d01;
+  background: #1e293b;
   padding: 15px;
-  margin-bottom: 10px;
-  border-left: 5px solid #22c55e;
-  width: 300px;
-  border-radius: 15px;
+  border-radius: 12px;
+  text-align: left;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.card h3 {
+  margin: 0 0 5px;
+  color: #22c55e;
+}
+
+.card p {
+  margin: 5px 0;
+}
+
+.editar {
+  background: #3b82f6;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  margin-right: 5px;
+}
+
+.excluir {
+  background: #ef4444;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
+
+.editar:hover {
+  background: #2563eb;
+}
+
+.excluir:hover {
+  background: #dc2626;
+}
+
+#busca {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: none;
 }
 
 .alerta {
-  border-left: 5px solid red;
+  color: #facc15;
+  font-weight: bold;
 }
 
-body {
-  background: red;
+.urgente {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.resumo {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.resumo h3 {
+  margin: 5px 0;
 }
