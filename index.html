@@ -52,26 +52,33 @@
       }
 
       function calcularDias(dia) {
-        if (!dia) return 0;
+        const diaNum = Number(dia);
+
+        if (!diaNum) return "-";
 
         const hoje = new Date().getDate();
-        let diff = dia - hoje;
+        let diff = diaNum - hoje;
 
         if (diff < 0) diff += 30;
 
-        return diff;
+        if (diff === 0) return "vence hoje";
+
+        return diff + " dias";
       }
 
       function salvar() {
+        const gdoorVal = document.getElementById("gdoor").value;
+        const cetechVal = document.getElementById("cetech").value;
+
         const dados = {
           nome: document.getElementById("nome").value,
           sistema: document.getElementById("sistema").value,
           custo: parseFloat(document.getElementById("custo").value) || 0,
           venda: parseFloat(document.getElementById("venda").value) || 0,
-          dia_vencimento_gdoor:
-            parseInt(document.getElementById("gdoor").value) || null,
-          dia_vencimento_cetech:
-            parseInt(document.getElementById("cetech").value) || null,
+
+          // ✅ corrigido
+          dia_vencimento_gdoor: gdoorVal ? parseInt(gdoorVal) : null,
+          dia_vencimento_cetech: cetechVal ? parseInt(cetechVal) : null,
         };
 
         const url = editandoId
@@ -133,37 +140,37 @@
             let totalCusto = 0;
 
             clientes.forEach((c) => {
-              const diasG = calcularDias(c.dia_vencimento_gdoor);
-              const diasC = calcularDias(c.dia_vencimento_cetech);
-
-              const venda = parseFloat(c.venda) || 0;
-              const custo = parseFloat(c.custo) || 0;
+              const venda = Number(c.venda) || 0;
+              const custo = Number(c.custo) || 0;
               const lucro = venda - custo;
 
               totalVenda += venda;
               totalCusto += custo;
 
+              const diasG = calcularDias(c.dia_vencimento_gdoor);
+              const diasC = calcularDias(c.dia_vencimento_cetech);
+
               const card = document.createElement("div");
               card.className = "card";
 
               card.innerHTML = `
-    <h3>${c.nome}</h3>
-    <p>${c.sistema}</p>
-    <p>💰 Venda: R$ ${venda.toFixed(2)}</p>
-    <p>💸 Custo: R$ ${custo.toFixed(2)}</p>
-    <p>🟢 Lucro: R$ ${lucro.toFixed(2)}</p>
+                <h3>${c.nome}</h3>
+                <p>${c.sistema}</p>
+                <p>💰 Venda: R$ ${venda.toFixed(2)}</p>
+                <p>💸 Custo: R$ ${custo.toFixed(2)}</p>
+                <p>🟢 Lucro: R$ ${lucro.toFixed(2)}</p>
 
-    <p>
-      📅 Gdoor: ${c.dia_vencimento_gdoor || "Não definido"} (${diasG} dias)
-    </p>
+                <p>📅 Gdoor: ${
+                  c.dia_vencimento_gdoor || "Não definido"
+                } (${diasG})</p>
 
-    <p>
-      📅 Cetech: ${c.dia_vencimento_cetech || "Não definido"} (${diasC} dias)
-    </p>
+                <p>📅 Cetech: ${
+                  c.dia_vencimento_cetech || "Não definido"
+                } (${diasC})</p>
 
-    <button class="editar">Editar</button>
-    <button class="excluir">Excluir</button>
-  `;
+                <button class="editar">Editar</button>
+                <button class="excluir">Excluir</button>
+              `;
 
               card.querySelector(".editar").onclick = () => editar(c);
               card.querySelector(".excluir").onclick = () => excluir(c.id);
@@ -173,12 +180,19 @@
 
             const lucroTotal = totalVenda - totalCusto;
 
-            totalVendaEl.innerText = `💰 Total vendido: R$ ${totalVenda.toFixed(2)}`;
-            totalCustoEl.innerText = `💸 Total custo: R$ ${totalCusto.toFixed(2)}`;
-            lucroTotalEl.innerText = `🟢 Lucro líquido: R$ ${lucroTotal.toFixed(2)}`;
+            totalVendaEl.innerText = `💰 Total vendido: R$ ${totalVenda.toFixed(
+              2,
+            )}`;
+            totalCustoEl.innerText = `💸 Total custo: R$ ${totalCusto.toFixed(
+              2,
+            )}`;
+            lucroTotalEl.innerText = `🟢 Lucro líquido: R$ ${lucroTotal.toFixed(
+              2,
+            )}`;
           });
       }
 
+      // ✅ ESSENCIAL (faltava isso)
       carregar();
     </script>
   </body>

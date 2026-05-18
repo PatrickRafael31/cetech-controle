@@ -11,7 +11,7 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "28042015", // coloque sua senha se tiver
+  password: "28042015",
   database: "cetech",
 });
 
@@ -31,11 +31,32 @@ app.get("/clientes", (req, res) => {
   });
 });
 
-// 📌 CADASTRAR CLIENTE
+// 📌 CADASTRAR CLIENTE (CORRIGIDO)
 app.post("/clientes", (req, res) => {
-  console.log("CHEGOU NO BACKEND");
+  console.log("CHEGOU NO BACKEND:", req.body);
 
-  const { nome, sistema, custo, venda, dia_gdoor, dia_cetech } = req.body;
+  const {
+    nome,
+    sistema,
+    custo,
+    venda,
+    dia_vencimento_gdoor,
+    dia_vencimento_cetech,
+  } = req.body;
+
+  const gdoor =
+    dia_vencimento_gdoor !== undefined &&
+    dia_vencimento_gdoor !== null &&
+    dia_vencimento_gdoor !== ""
+      ? parseInt(dia_vencimento_gdoor)
+      : null;
+
+  const cetech =
+    dia_vencimento_cetech !== undefined &&
+    dia_vencimento_cetech !== null &&
+    dia_vencimento_cetech !== ""
+      ? parseInt(dia_vencimento_cetech)
+      : null;
 
   const sql = `
     INSERT INTO clientes 
@@ -43,7 +64,7 @@ app.post("/clientes", (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [nome, sistema, custo, venda, dia_gdoor, dia_cetech], (err) => {
+  db.query(sql, [nome, sistema, custo, venda, gdoor, cetech], (err) => {
     if (err) {
       console.log("ERRO:", err);
       return res.status(500).json(err);
@@ -62,13 +83,37 @@ app.delete("/clientes/:id", (req, res) => {
   });
 });
 
-// 📌 EDITAR
+// 📌 EDITAR (AGORA ATUALIZA DATAS TAMBÉM)
 app.put("/clientes/:id", (req, res) => {
-  const { nome, sistema, custo, venda } = req.body;
+  const {
+    nome,
+    sistema,
+    custo,
+    venda,
+    dia_vencimento_gdoor,
+    dia_vencimento_cetech,
+  } = req.body;
+
+  const gdoor =
+    dia_vencimento_gdoor !== undefined &&
+    dia_vencimento_gdoor !== null &&
+    dia_vencimento_gdoor !== ""
+      ? parseInt(dia_vencimento_gdoor)
+      : null;
+
+  const cetech =
+    dia_vencimento_cetech !== undefined &&
+    dia_vencimento_cetech !== null &&
+    dia_vencimento_cetech !== ""
+      ? parseInt(dia_vencimento_cetech)
+      : null;
 
   db.query(
-    "UPDATE clientes SET nome=?, sistema=?, custo=?, venda=? WHERE id=?",
-    [nome, sistema, custo, venda, req.params.id],
+    `UPDATE clientes 
+     SET nome=?, sistema=?, custo=?, venda=?, 
+     dia_vencimento_gdoor=?, dia_vencimento_cetech=? 
+     WHERE id=?`,
+    [nome, sistema, custo, venda, gdoor, cetech, req.params.id],
     (err) => {
       if (err) return res.status(500).json(err);
       res.json({ ok: true });
