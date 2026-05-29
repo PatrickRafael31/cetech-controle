@@ -11,13 +11,13 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "28042015", // coloque sua senha se tiver
+  password: "28042015",
   database: "cetech",
 });
 
 db.connect((err) => {
   if (err) {
-    console.log("Erro ao conectar:", err);
+    console.log("❌ Erro ao conectar:", err);
   } else {
     console.log("🔥 MySQL conectado!");
   }
@@ -25,7 +25,7 @@ db.connect((err) => {
 
 // 📌 LISTAR CLIENTES
 app.get("/clientes", (req, res) => {
-  db.query("SELECT * FROM clientes", (err, result) => {
+  db.query("SELECT * FROM clientes ORDER BY id DESC", (err, result) => {
     if (err) return res.status(500).json(err);
     res.json(result);
   });
@@ -33,9 +33,16 @@ app.get("/clientes", (req, res) => {
 
 // 📌 CADASTRAR CLIENTE
 app.post("/clientes", (req, res) => {
-  console.log("CHEGOU NO BACKEND");
+  console.log("📥 BODY:", req.body);
 
-  const { nome, sistema, custo, venda, dia_gdoor, dia_cetech } = req.body;
+  const {
+    nome,
+    sistema,
+    custo,
+    venda,
+    dia_vencimento_gdoor,
+    dia_vencimento_cetech,
+  } = req.body;
 
   const sql = `
     INSERT INTO clientes 
@@ -43,15 +50,19 @@ app.post("/clientes", (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [nome, sistema, custo, venda, dia_gdoor, dia_cetech], (err) => {
-    if (err) {
-      console.log("ERRO:", err);
-      return res.status(500).json(err);
-    }
+  db.query(
+    sql,
+    [nome, sistema, custo, venda, dia_vencimento_gdoor, dia_vencimento_cetech],
+    (err) => {
+      if (err) {
+        console.log("❌ ERRO:", err);
+        return res.status(500).json(err);
+      }
 
-    console.log("SALVO COM SUCESSO");
-    res.json({ ok: true });
-  });
+      console.log("✅ SALVO COM SUCESSO");
+      res.json({ ok: true });
+    },
+  );
 });
 
 // 📌 EXCLUIR
@@ -62,15 +73,48 @@ app.delete("/clientes/:id", (req, res) => {
   });
 });
 
-// 📌 EDITAR
+// 📌 EDITAR (CORRIGIDO COM OS DIAS)
 app.put("/clientes/:id", (req, res) => {
-  const { nome, sistema, custo, venda } = req.body;
+  const { id } = req.params;
+
+  const {
+    nome,
+    sistema,
+    custo,
+    venda,
+    dia_vencimento_gdoor,
+    dia_vencimento_cetech,
+  } = req.body;
+
+  const sql = `
+    UPDATE clientes SET
+      nome = ?,
+      sistema = ?,
+      custo = ?,
+      venda = ?,
+      dia_vencimento_gdoor = ?,
+      dia_vencimento_cetech = ?
+    WHERE id = ?
+  `;
 
   db.query(
-    "UPDATE clientes SET nome=?, sistema=?, custo=?, venda=? WHERE id=?",
-    [nome, sistema, custo, venda, req.params.id],
+    sql,
+    [
+      nome,
+      sistema,
+      custo,
+      venda,
+      dia_vencimento_gdoor,
+      dia_vencimento_cetech,
+      id,
+    ],
     (err) => {
-      if (err) return res.status(500).json(err);
+      if (err) {
+        console.log("❌ ERRO UPDATE:", err);
+        return res.status(500).json(err);
+      }
+
+      console.log("✏️ ATUALIZADO COM SUCESSO");
       res.json({ ok: true });
     },
   );

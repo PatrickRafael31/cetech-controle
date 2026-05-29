@@ -52,14 +52,23 @@
       }
 
       function calcularDias(dia) {
-        if (!dia) return 0;
+        if (!dia) return "—";
 
-        const hoje = new Date().getDate();
-        let diff = dia - hoje;
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = hoje.getMonth();
 
-        if (diff < 0) diff += 30;
+        let dataVencimento = new Date(ano, mes, dia);
 
-        return diff;
+        // Se já passou, joga pro próximo mês
+        if (dataVencimento < hoje) {
+          dataVencimento = new Date(ano, mes + 1, dia);
+        }
+
+        const diffTime = dataVencimento - hoje;
+        const diffDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDias;
       }
 
       function salvar() {
